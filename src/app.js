@@ -28,6 +28,7 @@ server.use((req, res, next) => {
     next();
   }
 });
+
 server.use(session({
   secret: privateSecret,
   resave: false,
