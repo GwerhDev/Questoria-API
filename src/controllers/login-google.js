@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-const { userSchema } = require("../models/User");
+const userSchema = require("../models/User");
 const { clientUrl } = require("../config");
 const { createToken } = require("../integrations/jwt");
 const { loginGoogle } = require("../integrations/google-auth");
