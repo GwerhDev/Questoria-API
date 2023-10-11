@@ -55,7 +55,6 @@ router.get('/success', async (req, res) => {
       status: status.active,
     };
 
-
     if (adminEmailList.includes(user.email)) userData.role = roles.admin;
 
     const userCreated = new userSchema(userData);
