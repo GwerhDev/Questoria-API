@@ -17,7 +17,7 @@ router.post('/', async (req, res) => {
     
     if(existingUser) {
       const tokenData = {
-        id: existingUser.id,
+        id: existingUser._id,
         role: existingUser.role,
       };
       const token = await createToken(tokenData, 3);

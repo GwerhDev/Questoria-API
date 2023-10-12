@@ -7,7 +7,7 @@ const bcrypt = require("bcrypt");
 router.get("/my-data", async (req, res) => {
   try {
     const userToken = req.headers.authorization;
-    console.log(userToken)
+
     const decodedToken = await decodeToken(userToken);
     const user = await userSchema.findOne({_id: decodedToken.data.id});
 
@@ -20,8 +20,7 @@ router.get("/my-data", async (req, res) => {
       isVerified: user.isVerified,
       role: user.role,
       profilePic: user.profilePic || user.googlePic
-    }
-
+    };
 
     return res.status(200).send({ logged: true, userData });
   } catch (error) {
