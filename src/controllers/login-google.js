@@ -29,8 +29,8 @@ router.get('/success', async (req, res) => {
     const userExist = await userSchema.findOne({email: user.email});
     
     if (userExist) {
-      const { id, role } = userExist;
-      const data_login = { id, role };
+      const { _id, role } = userExist;
+      const data_login = { id: _id, role };
       const token = await createToken(data_login, 3);
 
       return res.status(200).redirect(`${clientUrl}/#/auth?token=${token}`);
