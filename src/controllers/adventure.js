@@ -45,7 +45,7 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params || {};
-    const adventure = await adventureSchema.findOne({ _id: id});
+    const adventure = await adventureSchema.findOne({ _id: id}).populate('quests');
     return res.status(200).send(adventure);
   } catch (error) {
     return res.status(500).send({ error: "Error fetching adventures" });
