@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const { message } = require("../messages");
 const { status, roles, methods } = require("../misc/consts-user-model");
 const { createToken } = require("../integrations/jwt");
-const { adminEmailList } = require("../config");
+const { adminEmailList, teacherEmailList } = require("../config");
 
 router.post('/', async (req, res) => {
   try {
@@ -32,7 +32,7 @@ router.post('/', async (req, res) => {
       status: status.inactive,
       isVerified: false,
       method: methods.inner,
-      role: roles.freemium,
+      role: roles.student,
       googleId: null,
       googlePic: null
     };
@@ -40,12 +40,13 @@ router.post('/', async (req, res) => {
     const salt = await bcrypt.genSalt();
     userData.password = await bcrypt.hash(password, salt);
 
+    if(teacherEmailList.includes(email)) userData.role = roles.teacher;
     if(adminEmailList.includes(email)) userData.role = roles.admin;
     
     const userCreated = await userSchema.create(userData);
 
     const tokenData = {
-      id: userCreated.id,
+      id: userCreated._id,
       role: userCreated.role,
     };
     const token = await createToken(tokenData, 3);

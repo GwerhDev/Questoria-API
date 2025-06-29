@@ -5,8 +5,8 @@ module.exports = {
   },
   roles: {
     admin: "admin",
-    freemium: "freemium",
-    subscriptor: "subscriptor"
+    teacher: "teacher",
+    student: "student"
   },
   methods: {
     inner: "inner",

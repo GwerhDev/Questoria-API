@@ -7,6 +7,7 @@ module.exports = {
   clientUrl: process.env.NODE_ENV === production ? process.env.CLIENT_URL_PROD : process.env.CLIENT_URL,
 
   adminEmailList: process.env.ADMIN_EMAIL_LIST,
+  teacherEmailList: process.env.TEACHER_EMAIL_LIST,
 
   privateSecret: process.env.PRIVATE_SECRET,
   defaultPassword: process.env.DEFAULT_PASSWORD,
@@ -14,6 +15,6 @@ module.exports = {
 
   mongodbString: process.env.MONGODB_STRING,
 
-  authClientId: process.env.AUTH_CLIENT_ID, 
+  authClientId: process.env.AUTH_CLIENT_ID,
   authClientSecret: process.env.AUTH_CLIENT_SECRET,
 }

@@ -26,8 +26,8 @@ router.get('/callback', passport.authenticate('login-google', {
 router.get('/success', async (req, res) => {
   try {
     const user = req.session.passport.user;
-    const userExist = await userSchema.findOne({email: user.email});
-    
+    const userExist = await userSchema.findOne({ email: user.email });
+
     if (userExist) {
       const { _id, role } = userExist;
       const data_login = { id: _id, role };
