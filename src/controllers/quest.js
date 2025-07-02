@@ -6,7 +6,7 @@ const { decodeToken } = require("../integrations/jwt");
 
 router.post("/create", async (req, res) => {
   try {
-    const userToken = req.headers.authorization;
+    const userToken = req.cookies.token;
     const { title, description, rewardId, levelRequirement, adventureId } = req.body;
 
     const decodedToken = await decodeToken(userToken);

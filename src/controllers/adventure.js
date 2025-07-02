@@ -6,7 +6,7 @@ const { message } = require('../messages');
 
 router.post("/create", async (req, res) => {
   try {
-    const userToken = req.headers.authorization;
+    const userToken = req.cookies.token;
     const { name, description } = req.body;
 
     const decodedToken = await decodeToken(userToken);

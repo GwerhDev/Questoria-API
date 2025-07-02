@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const { message } = require("../messages");
 const { status, roles, methods } = require("../misc/consts-user-model");
 const { createToken } = require("../integrations/jwt");
-const { adminEmailList, teacherEmailList } = require("../config");
+const { adminEmailList, teacherEmailList, cookieDomain, cookieSecure } = require("../config");
 
 router.post('/', async (req, res) => {
   try {
@@ -21,7 +21,8 @@ router.post('/', async (req, res) => {
         role: existingUser.role,
       };
       const token = await createToken(tokenData, 3);
-      return res.status(200).send({token});
+      res.cookie('token', token, { httpOnly: true, secure: cookieSecure, domain: cookieDomain, sameSite: 'Lax' });
+      return res.status(200).send({ msg: message.signup.success });
     };
     
     const userData = {
@@ -50,8 +51,8 @@ router.post('/', async (req, res) => {
       role: userCreated.role,
     };
     const token = await createToken(tokenData, 3);
-
-    return res.status(200).send({ msg: message.signup.success, token });
+    res.cookie('token', token, { httpOnly: true, secure: cookieSecure, domain: cookieDomain, sameSite: 'Lax' });
+    return res.status(200).send({ msg: message.signup.success });
 
   } catch (error) {
     return res.status(400).send({ error: message.signup.error });

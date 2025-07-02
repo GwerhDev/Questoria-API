@@ -4,7 +4,7 @@ const passport = require("passport");
 const userSchema = require("../models/User");
 const { signupGoogle } = require("../integrations/google-auth");
 const { createToken } = require("../integrations/jwt");
-const { clientUrl, defaultPassword, defaultUsername, adminEmailList, teacherEmailList } = require("../config");
+const { clientUrl, defaultPassword, defaultUsername, adminEmailList, teacherEmailList, cookieDomain, cookieSecure } = require("../config");
 const { status, methods, roles } = require("../misc/consts-user-model");
 
 passport.use('signup-google', signupGoogle);
@@ -39,7 +39,8 @@ router.get('/success', async (req, res) => {
         role: existingUser.role,
       };
       const token = await createToken(tokenData, 3);
-      return res.status(200).redirect(`${clientUrl}/auth?token=${token}`);
+      res.cookie('token', token, { httpOnly: true, secure: cookieSecure, domain: cookieDomain, sameSite: 'Lax' });
+      return res.status(200).redirect(`${clientUrl}/auth`);
     }
 
     const userData = {
@@ -67,8 +68,8 @@ router.get('/success', async (req, res) => {
     };
 
     const token = await createToken(tokenData, 3);
-
-    return res.status(200).redirect(`${clientUrl}/auth?token=${token}`);
+    res.cookie('token', token, { httpOnly: true, secure: cookieSecure, domain: cookieDomain, sameSite: 'Lax' });
+    return res.status(200).redirect(`${clientUrl}/auth`);
 
   } catch (error) {
     return res.send(error);

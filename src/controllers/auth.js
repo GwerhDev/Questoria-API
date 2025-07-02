@@ -2,10 +2,12 @@ const router = require('express').Router();
 const userSchema = require('../models/User');
 const { decodeToken } = require('../integrations/jwt');
 const { message } = require('../messages');
+const { cookieDomain } = require("../config");
 
 router.get("/", async (req, res) => {
   try {
-    const userToken = req.headers.authorization;
+    const userToken = req.cookies.token;
+    if (!userToken) return res.status(401).send({ logged: false, message: message.user.unauthorized });
     const decodedToken = await decodeToken(userToken);
     const user = await userSchema.findOne({ _id: decodedToken.data.id });
 
@@ -25,6 +27,11 @@ router.get("/", async (req, res) => {
   } catch (error) {
     return res.status(500).send({ error: message.user.error })
   }
+});
+
+router.post("/logout", (req, res) => {
+  res.clearCookie('token', { domain: cookieDomain, path: '/' });
+  return res.status(200).send({ logged: false, message: "Logged out successfully" });
 });
 
 module.exports = router;

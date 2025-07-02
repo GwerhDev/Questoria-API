@@ -4,23 +4,26 @@ const routes = require("./routes");
 
 const morgan = require("morgan");
 const session = require("express-session");
+const cookieParser = require("cookie-parser");
 
 const passport = require("passport");
 const bodyParser = require("body-parser");
-const { privateSecret } = require("./config");
+const { privateSecret, environment, clientUrl } = require("./config");
 
 server.use(bodyParser.json({limit: '100mb'}));
 server.use(bodyParser.urlencoded({limit: '100mb', extended: true}));
 server.use(morgan('dev'));
+server.use(cookieParser());
 
 server.use((req, res, next) => {
-  console.log('request from:', req.headers.origin);
-  console.log('method:', req.method);
-  console.log('route:', req.url); 
-
-  res.header('Access-Control-Allow-Origin', '*');
+  const allowedOrigins = environment === 'production' ? ['https://questoria.cl', 'https://www.questoria.cl', 'https://api.questoria.cl'] : ['http://localhost:3000', 'http://localhost:5173', clientUrl];
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
   res.header('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Access-Control-Allow-Origin');
+  res.header('Access-Control-Allow-Credentials', 'true');
 
   if (req.method === 'OPTIONS') {
     res.sendStatus(200);

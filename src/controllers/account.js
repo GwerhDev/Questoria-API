@@ -5,7 +5,7 @@ const { decodeToken } = require("../integrations/jwt");
 
 router.get("/my-data", async (req, res) => {
   try {
-    const userToken = req.headers.authorization;
+    const userToken = req.cookies.token;
 
     const decodedToken = await decodeToken(userToken);
     const user = await userSchema.findOne({ _id: decodedToken.data.id });
@@ -40,7 +40,7 @@ router.get("/my-data", async (req, res) => {
 
 router.patch("/update-profile", async (req, res) => {
   try {
-    const userToken = req.headers.authorization;
+    const userToken = req.cookies.token;
     const { username, profilePic } = req.body;
 
     const decodedToken = await decodeToken(userToken);

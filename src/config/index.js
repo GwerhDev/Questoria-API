@@ -6,6 +6,9 @@ module.exports = {
   apiUrl: process.env.NODE_ENV === production ? process.env.API_URL_PROD : process.env.API_URL,
   clientUrl: process.env.NODE_ENV === production ? process.env.CLIENT_URL_PROD : process.env.CLIENT_URL,
 
+  cookieDomain: process.env.NODE_ENV === production ? 'questoria.cl' : 'localhost',
+  cookieSecure: process.env.NODE_ENV === production ? true : false,
+
   adminEmailList: process.env.ADMIN_EMAIL_LIST,
   teacherEmailList: process.env.TEACHER_EMAIL_LIST,
 

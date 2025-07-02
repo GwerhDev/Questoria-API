@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const userSchema = require("../models/User");
-const { clientUrl } = require("../config");
+const { clientUrl, cookieDomain, cookieSecure } = require("../config");
 const { createToken } = require("../integrations/jwt");
 const { loginGoogle } = require("../integrations/google-auth");
 
@@ -32,8 +32,8 @@ router.get('/success', async (req, res) => {
       const { _id, role } = userExist;
       const data_login = { id: _id, role };
       const token = await createToken(data_login, 3);
-
-      return res.status(200).redirect(`${clientUrl}/auth?token=${token}`);
+      res.cookie('token', token, { httpOnly: true, secure: cookieSecure, domain: cookieDomain, sameSite: 'Lax' });
+      return res.status(200).redirect(`${clientUrl}/auth`);
     } else {
       return res.status(400).redirect(`${clientUrl}/auth?token=none`);
     }

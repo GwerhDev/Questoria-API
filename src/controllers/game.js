@@ -7,7 +7,7 @@ const { decodeToken } = require("../integrations/jwt");
 
 router.post("/gain-experience", async (req, res) => {
   try {
-    const userToken = req.headers.authorization;
+    const userToken = req.cookies.token;
     const { experience } = req.body;
 
     const decodedToken = await decodeToken(userToken);
@@ -27,7 +27,7 @@ router.post("/gain-experience", async (req, res) => {
 
 router.post("/level-up", async (req, res) => {
   try {
-    const userToken = req.headers.authorization;
+    const userToken = req.cookies.token;
 
     const decodedToken = await decodeToken(userToken);
     const user = await userSchema.findOne({ _id: decodedToken.data.id });
@@ -46,7 +46,7 @@ router.post("/level-up", async (req, res) => {
 
 router.post("/gain-points", async (req, res) => {
   try {
-    const userToken = req.headers.authorization;
+    const userToken = req.cookies.token;
     const { points } = req.body;
 
     const decodedToken = await decodeToken(userToken);
@@ -66,7 +66,7 @@ router.post("/gain-points", async (req, res) => {
 
 router.post("/complete-quest", async (req, res) => {
   try {
-    const userToken = req.headers.authorization;
+    const userToken = req.cookies.token;
     const { questId } = req.body;
 
     const decodedToken = await decodeToken(userToken);

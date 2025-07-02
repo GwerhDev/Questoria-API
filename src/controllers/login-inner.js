@@ -3,6 +3,7 @@ const { createToken } = require('../integrations/jwt');
 const { message } = require('../messages');
 const userSchema = require('../models/User');
 const bcrypt = require("bcrypt");
+const { cookieDomain, cookieSecure } = require("../config");
 
 router.post('/', async(req,res) => { 
   try {
@@ -16,7 +17,8 @@ router.post('/', async(req,res) => {
       const { _id, role } = user;
       const data = { _id, role };
       const token = await createToken(data, 3);
-      return res.status(200).send({ logged: true, token, message: message.login.success });
+      res.cookie('token', token, { httpOnly: true, secure: cookieSecure, domain: cookieDomain, sameSite: 'Lax' });
+      return res.status(200).send({ logged: true, message: message.login.success });
 
     } else {
       return res.status(400).send({ logged: false, message: message.login.error });

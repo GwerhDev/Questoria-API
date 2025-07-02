@@ -4,7 +4,7 @@ const { decodeToken } = require("../integrations/jwt");
 
 router.use(async (req, res, next) => {
   try {
-    const userToken = req.headers.authorization;
+    const userToken = req.cookies.token;
     const decodedToken = await decodeToken(userToken);
     const user = await userSchema.findOne({ _id: decodedToken.data.id });
 
