@@ -69,7 +69,7 @@ router.get('/success', async (req, res) => {
 
     const token = await createToken(tokenData, 3);
     res.cookie('token', token, { httpOnly: true, secure: cookieSecure, domain: cookieDomain, sameSite: 'Lax' });
-    return res.status(200).redirect(`${clientUrl}/auth`);
+    return res.status(200).redirect(`${clientUrl}/`);
 
   } catch (error) {
     return res.send(error);
