@@ -6,6 +6,7 @@ const loginGoogle = new GoogleStrategy(
     clientID: authClientId,
     clientSecret: authClientSecret,
     callbackURL: `${apiUrl}/login-google/callback`,
+    passReqToCallback: true,
     scope: [
       'email',
       'profile',
@@ -14,7 +15,7 @@ const loginGoogle = new GoogleStrategy(
       'https://www.googleapis.com/auth/plus.me'
     ],
     accessType: 'offline'
-  }, function (accessToken, refreshToken, profile, done) {
+  }, function (req, accessToken, refreshToken, profile, done) {
     process.nextTick(async function () {
       try {
         const userData = {
@@ -24,6 +25,7 @@ const loginGoogle = new GoogleStrategy(
           accessToken: accessToken,
           displayName: profile.displayName,
           googleId: profile.id,
+          redirect_uri: req.query.state ? JSON.parse(req.query.state).redirect_uri : undefined,
         }
         return done(null, userData);
       } catch (err) {

@@ -16,7 +16,11 @@ passport.deserializeUser((user, done) => {
   done(null, user);
 });
 
-router.get('/', passport.authenticate('login-google', { state: '200' }));
+router.get('/', (req, res, next) => {
+  const { redirect_uri } = req.query;
+  const state = redirect_uri ? JSON.stringify({ redirect_uri }) : undefined;
+  passport.authenticate('login-google', { state: state || '200' })(req, res, next);
+});
 
 router.get('/callback', passport.authenticate('login-google', {
   successRedirect: '/login-google/success',
@@ -27,15 +31,21 @@ router.get('/success', async (req, res) => {
   try {
     const user = req.session.passport.user;
     const userExist = await userSchema.findOne({ email: user.email });
+    let redirectUrl = `${clientUrl}/`;
+
+    if (user.redirect_uri) {
+      redirectUrl = user.redirect_uri;
+      delete user.redirect_uri; // Clean up the user object
+    }
 
     if (userExist) {
       const { _id, role } = userExist;
       const data_login = { id: _id, role };
       const token = await createToken(data_login, 3);
       res.cookie('token', token, { httpOnly: true, secure: cookieSecure, domain: cookieDomain, sameSite: 'Lax' });
-      return res.status(200).redirect(`${clientUrl}/`);
+      return res.status(200).redirect(redirectUrl);
     } else {
-      return res.status(400).redirect(`${clientUrl}/`);
+      return res.status(400).redirect(redirectUrl);
     }
   } catch (error) {
     return res.status(400).redirect(`${clientUrl}/`);

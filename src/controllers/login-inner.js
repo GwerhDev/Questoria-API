@@ -18,7 +18,12 @@ router.post('/', async(req,res) => {
       const data = { _id, role };
       const token = await createToken(data, 3);
       res.cookie('token', token, { httpOnly: true, secure: cookieSecure, domain: cookieDomain, sameSite: 'Lax' });
-      return res.status(200).send({ logged: true, message: message.login.success });
+      const { redirect_uri } = req.query;
+      if (redirect_uri) {
+        return res.redirect(redirect_uri);
+      } else {
+        return res.status(200).send({ logged: true, message: message.login.success });
+      }
 
     } else {
       return res.status(400).send({ logged: false, message: message.login.error });
