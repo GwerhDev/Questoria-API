@@ -1,6 +1,6 @@
 const router = require('express').Router();
-const userSchema = require('../models/User');
-const adventureSchema = require('../models/Adventure');
+const User = require('../models/User');
+const Adventure = require('../models/Adventure');
 const { decodeToken } = require('../integrations/jwt');
 const { message } = require('../messages');
 
@@ -10,24 +10,21 @@ router.post("/create", async (req, res) => {
     const { name, description } = req.body;
 
     const decodedToken = await decodeToken(userToken);
-    const user = await userSchema.findOne({ _id: decodedToken.data.id });
+    const user = await User.findById(decodedToken.data.id);
 
     if (!user || (user.role !== "teacher" && user.role !== "admin")) {
       return res.status(403).send({ message: "You are not authorized to create adventures" });
     }
 
-    const newAdventure = new adventureSchema({
+    const newAdventure = await Adventure.create({
       name,
       description,
-      createdBy: user._id,
+      createdBy: user.id,
     });
 
-    await newAdventure.save();
+    await User.update(user.id, { createdAdventures: [...user.createdAdventures, newAdventure.id] });
 
-    user.createdAdventures.push(newAdventure._id);
-    await user.save();
-
-    return res.status(201).send({ message: "Adventure created successfully", adventureId: newAdventure._id });
+    return res.status(201).send({ message: "Adventure created successfully", adventureId: newAdventure.id });
   } catch (error) {
     return res.status(500).send({ error: "Error creating adventure" });
   }

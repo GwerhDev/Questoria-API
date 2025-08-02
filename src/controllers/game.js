@@ -1,7 +1,7 @@
 const router = require("express").Router();
-const userSchema = require("../models/User");
-const questSchema = require("../models/Quest");
-const rewardSchema = require("../models/Reward");
+const User = require("../models/User");
+const Quest = require("../models/Quest");
+const Reward = require("../models/Reward");
 const { message } = require("../messages");
 const { decodeToken } = require("../integrations/jwt");
 
@@ -11,13 +11,11 @@ router.post("/gain-experience", async (req, res) => {
     const { experience } = req.body;
 
     const decodedToken = await decodeToken(userToken);
-    const user = await userSchema.findOne({ _id: decodedToken.data.id });
+    const user = await User.findById(decodedToken.data.id);
 
     if (!user) return res.status(404).send({ logged: false, message: message.user.notfound });
 
-    user.experience += experience;
-
-    await user.save();
+    await User.update(user.id, { experience: user.experience + experience });
 
     return res.status(200).send({ message: "Experience gained successfully" });
   } catch (error) {
@@ -30,13 +28,11 @@ router.post("/level-up", async (req, res) => {
     const userToken = req.cookies.token;
 
     const decodedToken = await decodeToken(userToken);
-    const user = await userSchema.findOne({ _id: decodedToken.data.id });
+    const user = await User.findById(decodedToken.data.id);
 
     if (!user) return res.status(404).send({ logged: false, message: message.user.notfound });
 
-    user.level += 1;
-
-    await user.save();
+    await User.update(user.id, { level: user.level + 1 });
 
     return res.status(200).send({ message: "Leveled up successfully" });
   } catch (error) {
@@ -50,13 +46,11 @@ router.post("/gain-points", async (req, res) => {
     const { points } = req.body;
 
     const decodedToken = await decodeToken(userToken);
-    const user = await userSchema.findOne({ _id: decodedToken.data.id });
+    const user = await User.findById(decodedToken.data.id);
 
     if (!user) return res.status(404).send({ logged: false, message: message.user.notfound });
 
-    user.points += points;
-
-    await user.save();
+    await User.update(user.id, { points: user.points + points });
 
     return res.status(200).send({ message: "Points gained successfully" });
   } catch (error) {
@@ -70,11 +64,11 @@ router.post("/complete-quest", async (req, res) => {
     const { questId } = req.body;
 
     const decodedToken = await decodeToken(userToken);
-    const user = await userSchema.findOne({ _id: decodedToken.data.id });
+    const user = await User.findById(decodedToken.data.id);
 
     if (!user) return res.status(404).send({ logged: false, message: message.user.notfound });
 
-    const quest = await questSchema.findOne({ _id: questId }).populate('reward');
+    const quest = await Quest.findById(questId);
 
     if (!quest) return res.status(404).send({ message: "Quest not found" });
 

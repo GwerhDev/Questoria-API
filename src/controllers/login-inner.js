@@ -1,21 +1,21 @@
 const router = require('express').Router();
 const { createToken } = require('../integrations/jwt');
 const { message } = require('../messages');
-const userSchema = require('../models/User');
+const User = require('../models/User');
 const bcrypt = require("bcrypt");
 const { cookieDomain, cookieSecure } = require("../config");
 
 router.post('/', async(req,res) => { 
   try {
     const { email, password } = req.body;
-    const user = await userSchema.findOne({ email });
+    const user = await User.findByEmail(email);
     if(!user) return res.status(400).send({ logged: false, message: message.login.failure });
     
     const passwordMatch = await bcrypt.compare(password, user.password);
     
     if(passwordMatch) {
-      const { _id, role } = user;
-      const data = { _id, role };
+      const { id, role } = user;
+      const data = { id, role };
       const token = await createToken(data, 3);
       res.cookie('token', token, { httpOnly: true, secure: cookieSecure, domain: cookieDomain, sameSite: 'Lax' });
       const { redirect_uri } = req.query;

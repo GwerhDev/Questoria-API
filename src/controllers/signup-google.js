@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-const userSchema = require("../models/User");
+const User = require("../models/User");
 const { signupGoogle } = require("../integrations/google-auth");
 const { createToken } = require("../integrations/jwt");
 const { clientUrl, defaultPassword, defaultUsername, adminEmailList, teacherEmailList, cookieDomain, cookieSecure } = require("../config");
@@ -31,11 +31,11 @@ router.get('/failure', (req, res) => {
 router.get('/success', async (req, res) => {
   try {
     const user = req.session.passport.user
-    const existingUser = await userSchema.findOne({ email: user.email });
+    const existingUser = await User.findByEmail(user.email);
 
     if (existingUser) {
       const tokenData = {
-        id: existingUser._id,
+        id: existingUser.id,
         role: existingUser.role,
       };
       const token = await createToken(tokenData, 3);
@@ -47,11 +47,9 @@ router.get('/success', async (req, res) => {
       username: user.username ?? defaultUsername,
       password: defaultPassword,
       email: user.email,
-      profilePic: null,
-      isVerified: true,
+      profile_pic: user.photo ?? null,
+      is_verified: true,
       method: methods.google,
-      googleId: user.googleId,
-      googlePic: user.photo ?? null,
       role: roles.student,
       status: status.active,
     };
@@ -59,11 +57,10 @@ router.get('/success', async (req, res) => {
     if (teacherEmailList.includes(user.email)) userData.role = roles.teacher;
     if (adminEmailList.includes(user.email)) userData.role = roles.admin;
 
-    const userCreated = new userSchema(userData);
-    await userCreated.save();
+    const userCreated = await User.create(userData);
 
     const tokenData = {
-      id: userCreated._id,
+      id: userCreated.id,
       role: userCreated.role,
     };
 

@@ -22,9 +22,7 @@ const loginGoogle = new GoogleStrategy(
           username: profile.name.givenName,
           email: profile.emails[0].value,
           photo: profile.photos[0].value,
-          accessToken: accessToken,
           displayName: profile.displayName,
-          googleId: profile.id,
           redirect_uri: req.query.state ? JSON.parse(req.query.state).redirect_uri : undefined,
         }
         return done(null, userData);
@@ -53,9 +51,7 @@ const signupGoogle = new GoogleStrategy({
         username: profile.name.givenName,
         email: profile.emails[0].value,
         photo: profile.photos[0].value,
-        accessToken: accessToken,
         displayName: profile.displayName,
-        googleId: profile.id,
       }
       return done(null, userData);
     } catch (err) {

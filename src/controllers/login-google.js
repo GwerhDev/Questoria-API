@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-const userSchema = require("../models/User");
+const User = require("../models/User");
 const { clientUrl, cookieDomain, cookieSecure } = require("../config");
 const { createToken } = require("../integrations/jwt");
 const { loginGoogle } = require("../integrations/google-auth");
@@ -30,7 +30,7 @@ router.get('/callback', passport.authenticate('login-google', {
 router.get('/success', async (req, res) => {
   try {
     const user = req.session.passport.user;
-    const userExist = await userSchema.findOne({ email: user.email });
+    const userExist = await User.findByEmail(user.email);
     let redirectUrl = `${clientUrl}/`;
 
     if (user.redirect_uri) {
@@ -39,8 +39,8 @@ router.get('/success', async (req, res) => {
     }
 
     if (userExist) {
-      const { _id, role } = userExist;
-      const data_login = { id: _id, role };
+      const { id, role } = userExist;
+      const data_login = { id: id, role };
       const token = await createToken(data_login, 3);
       res.cookie('token', token, { httpOnly: true, secure: cookieSecure, domain: cookieDomain, sameSite: 'Lax' });
       return res.status(200).redirect(redirectUrl);

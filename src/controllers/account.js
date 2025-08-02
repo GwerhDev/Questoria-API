@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const userSchema = require("../models/User");
+const User = require("../models/User");
 const { message } = require("../messages");
 const { decodeToken } = require("../integrations/jwt");
 
@@ -8,17 +8,17 @@ router.get("/my-data", async (req, res) => {
     const userToken = req.cookies.token;
 
     const decodedToken = await decodeToken(userToken);
-    const user = await userSchema.findOne({ _id: decodedToken.data.id });
+    const user = await User.findById(decodedToken.data.id);
 
     if (!user) return res.status(404).send({ logged: false, message: message.user.notfound });
 
     let userData = {
-      id: user._id,
+      id: user.id,
       username: user.username,
       email: user.email,
-      isVerified: user.isVerified,
+      isVerified: user.is_verified,
       role: user.role,
-      profilePic: user.profilePic || user.googlePic,
+      profile_pic: user.profile_pic || null,
     };
 
     if (user.role === 'student') {
@@ -41,17 +41,14 @@ router.get("/my-data", async (req, res) => {
 router.patch("/update-profile", async (req, res) => {
   try {
     const userToken = req.cookies.token;
-    const { username, profilePic } = req.body;
+    const { username, profile_pic } = req.body;
 
     const decodedToken = await decodeToken(userToken);
-    const user = await userSchema.findOne({ _id: decodedToken.data.id });
+    const user = await User.findById(decodedToken.data.id);
 
     if (!user) return res.status(404).send({ logged: false, message: message.user.notfound });
 
-    if (username) user.username = username;
-    if (profilePic) user.profilePic = profilePic;
-
-    await user.save();
+    await User.update(user.id, { username, profile_pic: profile_pic });
 
     return res.status(200).send({ message: "Profile updated successfully" });
   } catch (error) {

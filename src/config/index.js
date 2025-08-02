@@ -20,4 +20,7 @@ module.exports = {
 
   authClientId: process.env.AUTH_CLIENT_ID,
   authClientSecret: process.env.AUTH_CLIENT_SECRET,
+
+  supabaseUrl: process.env.SUPABASE_URL,
+  supabaseKey: process.env.SUPABASE_KEY,
 }
