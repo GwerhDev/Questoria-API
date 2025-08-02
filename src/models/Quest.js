@@ -65,6 +65,27 @@ const Quest = {
     if (error) throw error;
     return data;
   },
+
+  async findByAdventureId(adventureId) {
+    const { data: junctionData, error: junctionError } = await supabase
+      .from('adventure_quests')
+      .select('quest_id')
+      .eq('adventure_id', adventureId);
+    if (junctionError) throw junctionError;
+
+    const questIds = junctionData.map(item => item.quest_id);
+
+    if (questIds.length === 0) {
+      return [];
+    }
+
+    const { data, error } = await supabase
+      .from(TABLE_NAME)
+      .select('*, reward:rewards(*)')
+      .in('id', questIds);
+    if (error) throw error;
+    return data;
+  },
 };
 
 module.exports = Quest;
