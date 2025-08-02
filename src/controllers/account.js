@@ -18,7 +18,7 @@ router.get("/my-data", async (req, res) => {
       email: user.email,
       isVerified: user.is_verified,
       role: user.role,
-      profile_pic: user.profile_pic || null,
+      profile_pic: user.profile_pic || user.google_pic,
     };
 
     if (user.role === 'student') {

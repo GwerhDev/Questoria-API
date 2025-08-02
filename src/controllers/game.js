@@ -73,11 +73,11 @@ router.post("/complete-quest", async (req, res) => {
     if (!quest) return res.status(404).send({ message: "Quest not found" });
 
     if (quest.reward) {
-      user.points += quest.reward.points;
-      user.experience += quest.reward.experience;
+      await User.update(user.id, { 
+        points: user.points + quest.reward.points,
+        experience: user.experience + quest.reward.experience
+      });
     }
-
-    await user.save();
 
     return res.status(200).send({ message: "Quest completed successfully" });
   } catch (error) {

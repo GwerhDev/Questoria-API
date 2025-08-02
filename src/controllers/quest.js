@@ -3,6 +3,7 @@ const Quest = require("../models/Quest");
 const User = require("../models/User");
 const Adventure = require("../models/Adventure");
 const { decodeToken } = require("../integrations/jwt");
+const supabase = require("../integrations/supabase");
 
 router.post("/create", async (req, res) => {
   try {
@@ -25,12 +26,17 @@ router.post("/create", async (req, res) => {
     });
 
     // Add the quest to the adventure's quests array
-    const adventure = await Adventure.findById(adventureId);
-    if (adventure) {
-      await Adventure.update(adventure.id, { quests: [...adventure.quests, newQuest.id] });
+    if (adventureId) {
+      const { error: linkError } = await supabase
+        .from('adventure_quests')
+        .insert({
+          adventure_id: adventureId,
+          quest_id: newQuest.id,
+        });
+      if (linkError) throw linkError;
     }
 
-    await User.update(user.id, { createdQuests: [...user.createdQuests, newQuest.id] });
+    
 
     return res.status(201).send({ message: "Quest created successfully" });
   } catch (error) {
